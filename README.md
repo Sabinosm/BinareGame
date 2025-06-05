@@ -36,7 +36,17 @@ O jogador deve acertar combinações binárias em grupos de botões para avança
 | README.md        | Este arquivo de instruções.                |
 
 ---
+## ⚠️ Aviso importante
 
+O Windows Defender pode bloquear o arquivo `.exe` por ser de uma fonte não verificada.
+
+**Para rodar:**
+1. Após o download, clique com o botão direito no arquivo.
+2. Vá em **Propriedades**.
+3. Marque a opção **"Desbloquear"** (se aparecer) e clique em **OK**.
+4. Agora, execute normalmente.
+
+---
 
 
 ## ✅ Observações
