@@ -170,7 +170,7 @@ namespace binare_game
 
             if (level < 5 )
             {
-                if (linhas_faltando > 1)
+                if (linhas_faltando > 2)
                 {
                     await MostrarClear("+200 pontos", "- 1 linha");
                     linhas_faltando -= 1;
@@ -187,24 +187,24 @@ namespace binare_game
             }
             else if (level < 7)
             {
-                if (linhas_faltando > 3)
+                if (linhas_faltando > 4)
                 {
                     await MostrarClear("+400 pontos", "- 3 linhas");
-                    linhas_faltando -= 4;
+                    linhas_faltando -= 3;
                     pontuacao += 400;
                     lbl_pontuacao.Text = pontuacao.ToString();
                 }
                 else
                 {
-                    await MostrarClear("+400 pontos", "- total de linhas");
+                    await MostrarClear("+400 pontos", "-total de linhas");
                     linhas_faltando = 0;
-                    pontuacao += 400;
+                    pontuacao += 400; 
                     lbl_pontuacao.Text = pontuacao.ToString();
                 }
             }
             else if (level < 9)
             {
-                if (linhas_faltando > 4)
+                if (linhas_faltando > 5)
                 {
                     await MostrarClear("+600 pontos", "- 4 linhas");
                     linhas_faltando -= 4;
@@ -222,7 +222,7 @@ namespace binare_game
             else
             {
                
-                if(linhas_faltando > 5)
+                if(linhas_faltando > 7)
                 {
                     await MostrarClear("+1000 pontos", "- 6 linhas");
                     linhas_faltando -= 6;
