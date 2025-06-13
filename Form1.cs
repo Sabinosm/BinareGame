@@ -573,6 +573,7 @@ namespace binare_game
                         else
                         {
                             panel1.BackColor = SystemColors.ActiveCaption;
+                            emAndamento = true;
                             btn_pausar.Enabled = true;
                         }
 
