@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -22,6 +22,7 @@ namespace binare_game
 
 
         //variaveis
+        bool reAtivado = false;
         bool invertido = false;
         int acumulador = 0;
         int acumulador2 = 0;
@@ -41,7 +42,7 @@ namespace binare_game
         bool jogoPausado = false;
         List<GroupBox> gpVoltar = new List<GroupBox>();
         List<Button[]> allButons = new List<Button[]>();
-        bool emAndamento = false;
+        bool emAndamentoDificuldade = false;
 
 
 
@@ -51,9 +52,7 @@ namespace binare_game
 
         }
         private async void button1_Click(object sender, EventArgs e)
-        {
-
-
+        {   
 
             btn_start.Text = "START";
             pan_end.Visible = false;
@@ -118,8 +117,9 @@ namespace binare_game
 
             //ID_CONTINUIDADE
 
+            reAtivado = false;
 
-            await Dificuldade(10000, 129);
+            await Dificuldade(5000, 129);
 
 
         }
@@ -166,9 +166,9 @@ namespace binare_game
 
         private async Task ProcessarClear()
         {
-          
 
-            if (level < 5 )
+
+            if (level < 5)
             {
                 if (linhas_faltando > 2)
                 {
@@ -198,7 +198,7 @@ namespace binare_game
                 {
                     await MostrarClear("+400 pontos", "-total de linhas");
                     linhas_faltando = 0;
-                    pontuacao += 400; 
+                    pontuacao += 400;
                     lbl_pontuacao.Text = pontuacao.ToString();
                 }
             }
@@ -221,25 +221,26 @@ namespace binare_game
             }
             else
             {
-               
-                if(linhas_faltando > 7)
+
+                if (linhas_faltando > 7)
                 {
                     await MostrarClear("+1000 pontos", "- 6 linhas");
                     linhas_faltando -= 6;
                     pontuacao += 1000;
                     lbl_pontuacao.Text = pontuacao.ToString();
                 }
-                else 
+                else
                 {
                     await MostrarClear("+1000 pontos", "- total de linhas");
                     linhas_faltando = 0;
                     pontuacao += 1000;
                     lbl_pontuacao.Text = pontuacao.ToString();
                 }
-                    
+
 
                 pontuacao += 1000;
             }
+
 
             numerosClear++;
             lbl_pontuacao.Text = pontuacao.ToString();
@@ -333,12 +334,12 @@ namespace binare_game
             {
                 if (idBotao >= 0)
                 {
-                    
+                    label6.Text = $"{grupo.Name}/{idBotao}/{acumuladores[idBotao]}, {resposta}";
                     VerificarResultado(grupo, acumuladores[idBotao], resposta);
                 }
                 else if (acm >= 0)
                 {
-                    
+                    label6.Text = $"{grupo.Name}/{acm}/{acumuladores[acm]}, {resposta}";
                     VerificarResultado(grupo, acumuladores[acm], resposta);
                 }
             }
@@ -376,7 +377,7 @@ namespace binare_game
 
         private async Task<bool> EndGame(int tempo)
         {
-            emAndamento = false;
+            
 
 
             for (int timer = 0; timer <= tempo / 2; timer += 500)
@@ -494,16 +495,17 @@ namespace binare_game
 
         public async Task Dificuldade(int tempo, int random)
         {
-            if (emAndamento)
+            if (emAndamentoDificuldade)
             { return; }
 
-            emAndamento = true;
-
-            try
-            {
+            emAndamentoDificuldade = true;
                
                 while (linhas_faltando != 0)
                 {
+                if(reAtivado == true)
+                {
+                    return;
+                }
 
                     var proximo = grupoboxes.FirstOrDefault(gp => !gp.Visible);
 
@@ -566,24 +568,25 @@ namespace binare_game
 
                     else if (proximo == null)
                     {
-                        if (!await EndGame(tempo))
+                        if (await EndGame(tempo))
                         {
-                            break;
+                            panel1.BackColor = SystemColors.ActiveCaption;
+                            btn_pausar.Enabled = true;
+                            return;
                         }
                         else
                         {
-                            panel1.BackColor = SystemColors.ActiveCaption;
-                            emAndamento = true;
-                            btn_pausar.Enabled = true;
+                            continue;
                         }
 
                     }
+                if (reAtivado == true)
+                {
+                    return;
                 }
             }
-            finally 
-            { 
-                emAndamento = false; 
-            }
+            
+           
 
         }
         public void AuxiliarNext()
@@ -740,50 +743,61 @@ namespace binare_game
 
         private void btn_restart_Click(object sender, EventArgs e)
         {
-
+            // 1. Reset de todas as variáveis de estado
             ZerarAcumulador();
             level = 1;
             linhas_faltando = 10;
             pontuacao = 0;
-            btn_start.Enabled = true;
-            btn_desistir.Enabled = true;
-            btn_pausar.Enabled = true;
-            lbl_mensagem.Text = "Apartir do level 5 não apareceram mais números para consulta";
-
             tentativas++;
+            numerosClear = 0;
+            linhasPassadas = 0;
+            reAtivado = true;
 
+            // 2. Reset de interface
+            lbl_mensagem.Text = "A partir do level 5 não apareceram mais números para consulta";
             pan_nextLevel.Visible = false;
             btn_nextLevel.Visible = true;
             btn_restart.Visible = false;
             lbl_nextLevel.Text = $"Level {level} completo";
-            gp_consulta.Visible = true;
-            numerosClear = 0;
-            linhasPassadas = 0;
-            numerosClear = 0;
-            cronometro.Reset();
             pan_end.Visible = false;
             lbl_pontuacao.Text = pontuacao.ToString();
-            emAndamento = false;
-            jogoPausado = false;
+
+            // 3. Reset completo do estado do jogo
+            emAndamentoDificuldade = false;  // Permite que um novo jogo comece
+            jogo_parado = false;  // Garante que o jogo não está pausado
+
+            // 4. Ativação dos controles
+            btn_start.Enabled = true;
+            btn_desistir.Enabled = true;
             btn_pausar.Enabled = true;
+            gp_consulta.Visible = true;
 
+            // 6. Reset dos botões de rum
+            foreach (Button btn in butao_1)
+            {
+                btn.Enabled = true;
+                // Remove e readiciona os event handlers para evitar duplicação
+                btn.Click -= Botao_Click;
+                btn.Click += Botao_Click;
+            }
 
-            if (invertido == true)
+            // 7. Se estava em modo invertido
+            if (invertido)
             {
                 invertido = false;
                 Inversao();
             }
 
-            foreach (GroupBox gp in grupoboxes)
-            {
-                gp.Enabled = true;
-            }
+            // 8. Reinicia o cronômetro
+            cronometro.Reset();
 
+            // 9. Dispara o início automático (opcional)
+            // Se quiser que o jogo comece automaticamente:
             btn_start.PerformClick();
-           
+
         }
 
-        private void Inversao()
+            private void Inversao()
         {
             
             invertido = true;
@@ -851,6 +865,7 @@ namespace binare_game
             btn_restart.Visible = true;
             btn_pausar.Enabled = false;
             lbl_nextLevel.Text = "Você desistiu";
+             tentativas++;
         }
 
         private void btn_pausar_Click(object sender, EventArgs e)
